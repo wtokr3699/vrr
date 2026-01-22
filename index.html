@@ -28,7 +28,7 @@
         }
 
         .video-background {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -48,7 +48,7 @@
         }
 
         .video-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -113,6 +113,7 @@
             backdrop-filter: blur(10px);
             padding: 1rem;
             border-radius: 50px;
+            text-align: center;
         }
 
         @keyframes bounce {
@@ -124,6 +125,7 @@
             min-height: 100vh;
             padding: 6rem 2rem;
             position: relative;
+            z-index: 3;
         }
 
         .section-title {
@@ -200,6 +202,8 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             text-align: center;
             padding: 6rem 2rem;
+            position: relative;
+            z-index: 3;
         }
 
         .cta-button {
@@ -270,7 +274,8 @@
 <body>
     <section class="hero">
         <div class="video-background">
-            <iframe src="https://player.vimeo.com/video/1157058281?autoplay=1&loop=1&autopause=0&muted=1&background=1&controls=0&title=0&byline=0&portrait=0" 
+            <iframe id="vimeoPlayer" 
+                    src="https://player.vimeo.com/video/1157058281?autoplay=1&loop=1&autopause=0&background=1&controls=0&title=0&byline=0&portrait=0" 
                     frameborder="0" 
                     allow="autoplay; fullscreen; picture-in-picture" 
                     allowfullscreen>
@@ -378,7 +383,31 @@
         </div>
     </section>
 
+    <script src="https://player.vimeo.com/api/player.js"></script>
     <script>
+        // Vimeo 플레이어 초기화 및 소리 재생
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const iframe = document.getElementById('vimeoPlayer');
+                const player = new Vimeo.Player(iframe);
+                
+                // 클릭 시 소리 재생 (브라우저 자동재생 정책 때문)
+                let soundActivated = false;
+                document.body.addEventListener('click', function activateSound() {
+                    if (!soundActivated) {
+                        player.setVolume(1);
+                        player.play();
+                        soundActivated = true;
+                    }
+                }, { once: true });
+                
+                // 반복 재생
+                player.on('ended', function() {
+                    player.play();
+                });
+            }, 500);
+        });
+
         document.querySelectorAll('a[href="#"]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -409,18 +438,3 @@
     </script>
 </body>
 </html>
-```
-
-4. `Commit new file` 클릭
-
-### 3단계: GitHub Pages 활성화
-1. 저장소 상단 메뉴에서 `Settings` 클릭
-2. 왼쪽 사이드바에서 `Pages` 클릭
-3. **Source**에서 `Deploy from a branch` 선택
-4. **Branch**에서 `main` 선택, 폴더는 `/ (root)` 선택
-5. `Save` 클릭
-
-### 4단계: 웹사이트 접속
-2-3분 후 다음 주소로 접속하면 됩니다:
-```
-https://[당신의GitHub아이디].github.io/kpop-vr-concert/
